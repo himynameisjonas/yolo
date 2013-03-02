@@ -54,18 +54,10 @@ EM.schedule do
   client = stream if @occupied
   EM::PeriodicTimer.new(5) do
     if occupied?
-      puts "occupied"
-      unless client
-        puts "start stream"
-        client = stream
-      end
+      client = stream unless client
     else
-      puts "not occupied"
-      if client
-        puts "stopping stream"
-        client.stop
-        client = nil
-      end
+      client.stop if client
+      client = nil
     end
   end
 end
