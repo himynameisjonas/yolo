@@ -15,7 +15,7 @@
       channel.bind('tweet', function(data) {
         var tweet = template.clone().hide();
         tweet.find(".screen_name").text(data.screen_name + ":");
-        tweet.find(".text").text(data.text.replace(/yolo/i, yolo));
+        tweet.find(".text").text(data.text.replace(/yolo/ig, yolo));
         tweet.find("img").attr("src", data.profile_image_url.replace(/_normal\./, "_bigger."));
         queue.unshift(tweet)
       });
