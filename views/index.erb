@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<head>
+  <title>#<%= @yolo %> is the new #yolo</title>
+  <script src="http://js.pusher.com/1.12/pusher.min.js" type="text/javascript"></script>
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script type="text/javascript">
+    // Enable pusher logging - don't include this in production
+    Pusher.log = function(message) {
+      if (window.console && window.console.log) window.console.log(message);
+    };
+
+    // Flash fallback logging - don't include this in production
+    WEB_SOCKET_DEBUG = true;
+
+    $(function(){
+      var queue = []
+      var body = $("body");
+      var template = $("#template");
+      var yolo = $("body").data("yolo");
+      var pusher = new Pusher('<%= @pusher %>');
+      var channel = pusher.subscribe('yolo');
+
+      channel.bind('tweet', function(data) {
+        var tweet = template.clone().hide();
+        tweet.find(".screen_name").text(data.screen_name + ":");
+        tweet.find(".text").text(data.text.replace(/yolo/i, yolo));
+        tweet.find("img").attr("src", data.profile_image_url.replace(/_normal\./, "_bigger."));
+        queue.unshift(tweet)
+      });
+
+      function popper(){
+        if (queue.length > 0) {
+          tweet = queue.pop();
+          tweet.prependTo(body).slideDown();
+        };
+        setTimeout(popper, 1300)
+      }
+
+      function keepAlive(){
+        setTimeout(function(){
+          $.get("/alive")
+          keepAlive()
+        }, 60000)
+      }
+      popper();
+      keepAlive();
+    })
+  </script>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,800' rel='stylesheet' type='text/css'>
+
+  <style>
+    body {
+      background: #2E3339;
+      color: #414145;
+      font-family: 'Open Sans', sans-serif;
+    }
+    .tweet {
+      background: #fff;
+      -webkit-border-radius: 5px;
+      border-radius: 5px;
+      padding: 15px;
+      overflow: hidden;
+      max-width: 510px;
+      margin: 23px auto;
+    }
+    .screen_name {
+      font-weight: 800;
+    }
+    img {
+      float: left;
+      margin-right: 10px;
+      margin-top: 6px;
+      height: 48px;
+      width: 48px;
+    }
+  </style>
+</head>
+<body data-yolo="<%= @yolo %>">
+  <div class="tweet" id="template">
+    <img src="https://twimg0-a.akamaihd.net/profile_images/1537278770/avatar_sk_gg-1_bigger.png">
+    <div class="text-wrapper">
+      <span class="screen_name">@himynameisjonas</span>
+      <span class="text">#<%= @yolo %> is the new #yolo</span>
+    </div>
+  </div>
+</body>
