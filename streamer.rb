@@ -36,15 +36,16 @@ get '/alive' do
 end
 
 get '/' do
-  redirect to("/cocaine")
+  content_type 'text/html', :charset => 'utf-8'
+  erb :index
 end
 
 get '/:yolo' do
   content_type 'text/html', :charset => 'utf-8'
-  @yolo = params[:yolo] || "cocaine"
+  @yolo = params[:yolo]
   @pusher = ENV['PUSHER_KEY']
   @@occupied = Time.now.to_i
-  erb :index
+  erb :stream
 end
 
 def occupied?
