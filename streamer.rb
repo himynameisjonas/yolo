@@ -32,6 +32,7 @@ end
 
 get '/alive' do
   @@occupied = Time.now.to_i
+  "ok"
 end
 
 get '/' do
